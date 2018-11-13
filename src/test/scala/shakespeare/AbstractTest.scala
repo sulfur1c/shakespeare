@@ -1,18 +1,17 @@
 package shakespeare
 
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql.SparkSession
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
 abstract class AbstractTest extends FunSuite with BeforeAndAfter{
 
-  var sc: SparkContext = _
+  var spark: SparkSession = _
 
   before {
-    val conf = new SparkConf().setAppName(this.getClass.getName).setMaster("local[*]")
-    sc = new SparkContext(conf)
+    spark = SparkSession.builder().master("local").getOrCreate()
   }
 
   after {
-    sc.stop()
+    spark.sparkContext.stop()
   }
 }

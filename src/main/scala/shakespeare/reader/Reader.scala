@@ -1,7 +1,7 @@
 package shakespeare.reader
 
-import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.DataFrame
 
 trait Reader {
-  def read(): RDD[String]
+  def read(): DataFrame
 }

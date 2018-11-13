@@ -5,7 +5,7 @@ import SparkAccessor.{spark, sc}
 object ShakespeareApp {
 
   def main(args: Array[String]): Unit = {
-    val shakespeareRunner = new ShakespeareRunner(sc)
+    val shakespeareRunner = new ShakespeareRunner(spark)
     shakespeareRunner.run()
     spark.close()
   }

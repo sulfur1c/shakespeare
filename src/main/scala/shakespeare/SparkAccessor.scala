@@ -13,7 +13,7 @@ object SparkAccessor {
       .builder()
       .appName("Time Usage")
       .config("spark.master", "local")
-      .config("mapreduce.input.fileinputformat.input.dir.recursive", true)
+      .config("spark.hadoop.mapreduce.input.fileinputformat.input.dir.recursive", "true")
       .getOrCreate()
 
   val sc: SparkContext = spark.sparkContext
