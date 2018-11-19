@@ -1,24 +1,14 @@
 package shakespeare
 
-import org.apache.spark.sql.SparkSession
-import shakespeare.filter.ShakespeareWorkFilter
-import shakespeare.reader.FileTextReader
-import org.apache.spark.sql.functions._
+import org.apache.spark.SparkContext
 
-class ShakespeareRunner(spark: SparkSession) {
+class ShakespeareRunner(sc: SparkContext) {
 
   def run(): Unit = {
-    val textToAnalyzeRaw = new FileTextReader(spark).read().cache()
 
-    val fileNames = textToAnalyzeRaw.groupBy("input_file_name")
-                                        .agg(first("value") as "value", min("row_number") as "row_number")
-    val shakespeareWorkFileNames = new ShakespeareWorkFilter().filter(fileNames)
+    val textToAnalyze = sc.wholeTextFiles("src/main/resources/shakespeare/*/*").cache()
+    val shakespeareWork = textToAnalyze.filter(rec => rec._2.contains("S\u0000h\u0000a\u0000k\u0000e\u0000s\u0000p\u0000e\u0000a\u0000r\u0000e\u0000 \u0000-\u0000-"))
 
-    val textToAnalyze = textToAnalyzeRaw.where(textToAnalyzeRaw("input_file_name")
-                                            .isin(shakespeareWorkFileNames.collect().toList))
-
-    textToAnalyze.select(textToAnalyze("input_file_name")).collect().foreach(println)
-
-    println("Despues de filtrado: " + shakespeareWorkFileNames.count())
+    println("algo:" + textToAnalyze.take(5).foreach(x => x._2))
   }
 }
