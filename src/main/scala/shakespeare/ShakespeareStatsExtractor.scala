@@ -3,6 +3,10 @@ package shakespeare
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
+/**
+  * Class to extract some stats in text files
+  * @param sc the spark context
+  */
 class ShakespeareStatsExtractor(sc: SparkContext) {
 
   def run(): Unit = {
@@ -22,17 +26,17 @@ class ShakespeareStatsExtractor(sc: SparkContext) {
     sc.wholeTextFiles(path).map(file => (file._1, file._2.replace("\u0000", "")))
   }
 
-  private def filterShakespeareWork(textToAnalyze: RDD[(String, String)]) = {
+  def filterShakespeareWork(textToAnalyze: RDD[(String, String)]): RDD[(String, String)] = {
     textToAnalyze.filter(file => file._2.contains("Shakespeare --"))
   }
 
-  private def findMostCommonWords(shakespeareWork: RDD[(String, String)]) = {
+  def findMostCommonWords(shakespeareWork: RDD[(String, String)]): Array[(String, Int)] = {
     shakespeareWork.flatMap(file => file._2.split(" ")).map(word => (word, 1))
                                                        .reduceByKey((a, b) => a + b)
                                                        .takeOrdered(5)(Ordering[Int].reverse.on(rec => rec._2))
   }
 
-  private def findLongestSentences(shakespeareWork: RDD[(String, String)]) = {
+  def findLongestSentences(shakespeareWork: RDD[(String, String)]): Array[(String, Int)] = {
     shakespeareWork.flatMap(file => file._2.split("\\.")).flatMap(file => file.split("\\,"))
                                                          .flatMap(file => file.split("\\;"))
                                                          .flatMap(file => file.split("\r\n"))
@@ -41,7 +45,7 @@ class ShakespeareStatsExtractor(sc: SparkContext) {
                                                          .takeOrdered(5)(Ordering[Int].reverse.on(rec => rec._2))
   }
 
-  private def findLongestWords(shakespeareWork: RDD[(String, String)]) = {
+  def findLongestWords(shakespeareWork: RDD[(String, String)]): Array[(String, Int)] = {
     shakespeareWork.flatMap(file => file._2.split(" ")).flatMap(file => file.split("\r\n"))
                                                        .flatMap(file => file.split("-"))
                                                        .flatMap(file => file.split("//"))
